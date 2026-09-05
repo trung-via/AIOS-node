@@ -1,0 +1,145 @@
+task_id: NODE-003B
+revision: 1
+
+goal: >
+  Implement a minimal standalone Android cold-boot helper that bypasses the failed
+  Termux:Boot JobScheduler path and starts only the already-proven Termux service supervisor
+  through Termux's exported RUN_COMMAND surface, without acquiring any AIOS execution authority.
+
+problem: >
+  NODE-003 proved the AIOS-node host, runit adapter, READY state, and runit host-process restart
+  on the physical Mi 10 Pro, but repeated real reboots did not execute Termux:Boot canary/scripts
+  even with Termux and Termux:Boot Autostart enabled and unrestricted battery policy. N4 remains
+  blocked at the Android cold-boot delivery boundary. The fallback must change only that boundary
+  and must not disturb the already-proven host/service stack.
+
+assumptions:
+  - NODE-001 and NODE-002 remain passed and published.
+  - NODE-003 physical evidence is recorded in docs/N4-MI10-BOOT-BLOCKER.md.
+  - The target phone runs Termux 0.118.3 from the GitHub build family on Android 10 / MIUI-family firmware.
+  - Termux declares the dangerous permission com.termux.permission.RUN_COMMAND and exports
+    com.termux.app.RunCommandService as its documented third-party command bridge.
+  - Termux external-command policy still requires allow-external-apps=true in termux.properties.
+  - This TASK implements source/build surfaces only; final N4 PASS still requires later physical
+    on-device qualification after the APK is built and installed.
+
+scope:
+  inspect:
+    - docs/AIOS-NODE-CONSTITUTION.md
+    - docs/AIOS-NODE-BOUNDARY.md
+    - docs/CHATGPT_PROJECT_CONTRACT.md
+    - docs/AIOS-NODE-ROADMAP.md
+    - docs/N4-PERSISTENT-HOST-PLAN.md
+    - docs/N4-MI10-BOOT-BLOCKER.md
+    - docs/N4-NODE-003B-ANDROID-BOOTSTRAP-DESIGN.md
+    - deploy/termux/services/aios-node/run
+    - pyproject.toml
+  modify:
+    - android/boot-bootstrap/settings.gradle
+    - android/boot-bootstrap/build.gradle
+    - android/boot-bootstrap/app/build.gradle
+    - android/boot-bootstrap/app/src/main/AndroidManifest.xml
+    - android/boot-bootstrap/app/src/main/java/io/aios/node/bootstrap/BootstrapContract.java
+    - android/boot-bootstrap/app/src/main/java/io/aios/node/bootstrap/BootReceiver.java
+    - android/boot-bootstrap/app/src/main/java/io/aios/node/bootstrap/MainActivity.java
+    - android/boot-bootstrap/app/src/main/res/values/strings.xml
+    - deploy/termux/bootstrap/start-services.sh
+    - .github/workflows/build-android-bootstrap.yml
+    - docs/N4-ANDROID-BOOTSTRAP.md
+    - tests/test_android_bootstrap.py
+
+non_goals:
+  - Modify Termux or Termux:Boot source/APKs.
+  - Sign the helper with Termux's GitHub test key or share Termux's UID.
+  - Close NODE-003/N4 without a later physical reboot proof.
+  - Add remote request ingestion, GitHub self-hosted runners, polling, durable request identity,
+    crash reconciliation, or any N5+ capability.
+  - Invoke AIOS-renew, Antigravity, Codex, any model, target-project verification, repair, or publication.
+  - Add retries, WorkManager, JobScheduler, AlarmManager, periodic work, wake locks, or background polling.
+  - Add network access, analytics, telemetry upload, cloud APIs, or repository credentials.
+  - Create a generic shell/command launcher.
+  - Change NODE-001 host semantics or NODE-002 runit adapter semantics.
+
+constraints:
+  hard:
+    - The Android helper must be a standalone package with its own application id and must not
+      declare android:sharedUserId or use Termux signing material.
+    - AndroidManifest.xml may request only the minimum permissions needed for this boundary:
+      android.permission.RECEIVE_BOOT_COMPLETED and com.termux.permission.RUN_COMMAND; it must not
+      request INTERNET, storage, accessibility, device-admin, VPN, package-install, root, or wake-lock permissions.
+    - The BOOT_COMPLETED receiver must be non-exported and must perform at most one fixed dispatch
+      per received boot broadcast; no retry loop, scheduler, alarm, worker, polling, or delayed redelivery is allowed.
+    - The fixed dispatch target must be explicit Termux component
+      com.termux/com.termux.app.RunCommandService with action com.termux.RUN_COMMAND.
+    - The helper must pass one compile-time constant command path only:
+      /data/data/com.termux/files/home/.aios-node/bootstrap/start-services.sh.
+      No Intent extra, UI field, file, network payload, clipboard value, or external input may alter
+      command path, command arguments, Termux component, or action.
+    - The RUN_COMMAND invocation must select Termux background/app-shell execution and must not open
+      an interactive terminal session.
+    - On Android O and later the receiver must invoke the Termux bridge with startForegroundService;
+      older supported Android versions may use startService.
+    - The helper may store only bounded local operational diagnostics in its own SharedPreferences,
+      such as last boot-receiver time and dispatch outcome. It must not store TASK/RUN/RESULT/REVIEW truth.
+    - MainActivity may only report setup/diagnostic state and request com.termux.permission.RUN_COMMAND.
+      It must not expose arbitrary command text, path editing, shell execution, remote endpoints, or Executor controls.
+    - deploy/termux/bootstrap/start-services.sh must use the native Termux shell, set deterministic
+      PREFIX/SVDIR/LOGDIR, write bounded boot-local markers, and invoke service-daemon start exactly once.
+      It must contain no loop, retry, network call, git command, AIOS command, Executor command,
+      verification, wake lock, service enable/disable action, or publication behavior.
+    - The Android module must use platform Android APIs and Java only; no AndroidX, WorkManager,
+      networking SDK, agent/model SDK, analytics SDK, or external runtime library is permitted.
+    - The GitHub workflow must use GitHub-hosted infrastructure only, require no secrets, build only
+      android/boot-bootstrap, and upload only the qualification APK artifact. It must never use
+      self-hosted runners or invoke AIOS/executors.
+    - Local deterministic verification must not require an Android SDK or network; repository tests
+      must statically validate manifest/source/workflow/bootstrap-script authority boundaries.
+    - Documentation must explicitly call out the security implication of Termux allow-external-apps=true
+      and require that RUN_COMMAND permission be granted only to this bounded helper during qualification.
+
+acceptance:
+  - id: AC1
+    condition: >
+      The Android manifest defines a standalone helper with a non-exported BOOT_COMPLETED receiver,
+      a launcher setup Activity, and only RECEIVE_BOOT_COMPLETED plus com.termux.permission.RUN_COMMAND;
+      no network/storage/root/wake-lock/shared-UID permissions or declarations exist.
+  - id: AC2
+    condition: >
+      BootReceiver performs one explicit, fixed dispatch to com.termux.app.RunCommandService using
+      action com.termux.RUN_COMMAND and the immutable bootstrap path
+      /data/data/com.termux/files/home/.aios-node/bootstrap/start-services.sh, with no caller-controlled
+      command/path/arguments and no retry/scheduler/polling mechanism.
+  - id: AC3
+    condition: >
+      MainActivity can request/check RUN_COMMAND permission and display bounded local setup/boot-dispatch
+      diagnostics but exposes no generic command execution or remote-control surface.
+  - id: AC4
+    condition: >
+      deploy/termux/bootstrap/start-services.sh deterministically establishes Termux service environment,
+      writes bounded host-local boot marker data, and invokes service-daemon start exactly once without
+      AIOS, Executor, Git, network, verification, retry, polling, wake-lock, or publication behavior.
+  - id: AC5
+    condition: >
+      The standalone Android build definition has no runtime dependencies beyond Android platform APIs,
+      and .github/workflows/build-android-bootstrap.yml uses only GitHub-hosted build infrastructure,
+      no secrets/self-hosted runner, and uploads a debug APK qualification artifact.
+  - id: AC6
+    condition: >
+      docs/N4-ANDROID-BOOTSTRAP.md documents installation, one-time RUN_COMMAND permission grant,
+      Termux allow-external-apps=true requirement, Xiaomi Autostart/battery requirements, bootstrap
+      deployment path, security boundary, artifact limitations, and the later physical reboot gate.
+  - id: AC7
+    condition: >
+      Standard-library repository tests deterministically reject any addition of generic command input,
+      network permission, shared Termux UID/signing coupling, AIOS/Executor invocation, retry/scheduler
+      mechanisms, self-hosted GitHub runner usage, or authority expansion in the NODE-003B surfaces.
+  - id: AC8
+    condition: >
+      Existing AIOS-node standard-library tests remain green. NODE-003B source completion does not mark
+      N4 PASS; physical cold-boot evidence remains a separate required qualification.
+
+verification:
+  required:
+    - python -m unittest discover -s tests -p 'test_*.py'
+    - python -m compileall -q src tests
+    - git diff --check

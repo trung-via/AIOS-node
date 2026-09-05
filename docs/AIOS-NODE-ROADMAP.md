@@ -20,7 +20,7 @@ N0 Governance Baseline             DONE
 N1 Mi 10 Pro Host Preflight        DONE
 N2 Pinned AIOS-renew Compatibility DONE
 N3 Disposable End-to-End Proof     DONE
-N4 Persistent Host                 NEXT
+N4 Persistent Host                 ACTIVE
 ```
 
 N1 canonical report: [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md)
@@ -32,6 +32,10 @@ N2 canonical report: [`N2-MI10-COMPATIBILITY-REPORT.md`](N2-MI10-COMPATIBILITY-R
 N3 execution plan: [`N3-DISPOSABLE-E2E-PLAN.md`](N3-DISPOSABLE-E2E-PLAN.md)
 
 N3 canonical report: [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md)
+
+N4 active plan: [`N4-PERSISTENT-HOST-PLAN.md`](N4-PERSISTENT-HOST-PLAN.md)
+
+N4 current implementation task: `.ai/tasks/NODE-001.yaml`.
 
 ## Required sequence
 
@@ -141,22 +145,37 @@ A complete attributable execution exists with no duplicate authority.
 
 Result: PASS via `RUN-N3-SMOKE-001`. See [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md).
 
-### N4 — Persistent Host
+### N4 — Persistent Host — ACTIVE
 
 Goal:
 Keep AIOS-node available across normal Android lifecycle events.
 
 Target mechanisms:
+- portable host core;
 - Termux native service supervision;
 - boot restart;
-- explicit host state: READY / BUSY / DEGRADED / OFFLINE.
+- bounded host state vocabulary: READY / BUSY / DEGRADED / OFFLINE.
+
+Semantic refinement:
+- N4 core locally emits READY or DEGRADED only;
+- BUSY is reserved for later bounded dispatch;
+- OFFLINE is inferred externally rather than self-authored by a dead process.
+
+Implementation sequence:
+- `NODE-001` — portable host core;
+- `NODE-002` — thin Termux runit service adapter;
+- `NODE-003` — boot/restart conformance.
 
 Non-goals:
 - no remote wakeup yet;
-- no autonomous execution retry.
+- no autonomous execution retry;
+- no AIOS RUN supervision or restart;
+- no mandatory wake lock without measured need.
 
 Gate:
-reboot → service restart → READY, with no invented engineering state.
+reboot → service restart → READY (or deterministic host-local DEGRADED), with no invented engineering state and no AIOS RUN started by service recovery.
+
+Active plan: [`N4-PERSISTENT-HOST-PLAN.md`](N4-PERSISTENT-HOST-PLAN.md).
 
 ### N5 — Bounded Request Contract
 

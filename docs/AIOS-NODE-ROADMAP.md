@@ -19,7 +19,8 @@ second AIOS Runtime or orchestration authority.
 N0 Governance Baseline             DONE
 N1 Mi 10 Pro Host Preflight        DONE
 N2 Pinned AIOS-renew Compatibility DONE
-N3 Disposable End-to-End Proof     ACTIVE
+N3 Disposable End-to-End Proof     DONE
+N4 Persistent Host                 NEXT
 ```
 
 N1 canonical report: [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md)
@@ -29,6 +30,8 @@ N2 canonical compatibility target: [`N2-AIOS-RENEW-PIN.md`](N2-AIOS-RENEW-PIN.md
 N2 canonical report: [`N2-MI10-COMPATIBILITY-REPORT.md`](N2-MI10-COMPATIBILITY-REPORT.md)
 
 N3 execution plan: [`N3-DISPOSABLE-E2E-PLAN.md`](N3-DISPOSABLE-E2E-PLAN.md)
+
+N3 canonical report: [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md)
 
 ## Required sequence
 
@@ -105,7 +108,7 @@ Gate:
 
 Result: PASS. See [`N2-MI10-COMPATIBILITY-REPORT.md`](N2-MI10-COMPATIBILITY-REPORT.md).
 
-### N3 — Disposable End-to-End Execution Proof — ACTIVE
+### N3 — Disposable End-to-End Execution Proof — DONE
 
 Goal:
 Prove one canonical AIOS execution on a disposable smoke repository using Antigravity through
@@ -136,7 +139,7 @@ Hard constraints:
 Gate:
 A complete attributable execution exists with no duplicate authority.
 
-Active bounded plan: [`N3-DISPOSABLE-E2E-PLAN.md`](N3-DISPOSABLE-E2E-PLAN.md).
+Result: PASS via `RUN-N3-SMOKE-001`. See [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md).
 
 ### N4 — Persistent Host
 

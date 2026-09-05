@@ -1,0 +1,16 @@
+{
+  "project": "AIOS-node",
+  "phase": "N0",
+  "status": "BOOTSTRAP_READY",
+  "files": [
+    ".gitignore",
+    "README.md",
+    "docs/AIOS-NODE-BOUNDARY.md",
+    "docs/AIOS-NODE-CONSTITUTION.md",
+    "docs/AIOS-NODE-ROADMAP.md",
+    "docs/CHATGPT_PROJECT_CONTRACT.md",
+    "docs/PROJECT-BOOTSTRAP.md"
+  ],
+  "next_task": "NODE-001 \u2014 Mi 10 Pro Host Preflight",
+  "architectural_rule": "AIOS-node may depend on AIOS-renew; AIOS-renew must not depend on AIOS-node."
+}

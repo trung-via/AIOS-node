@@ -1,0 +1,22 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Operational Node state must never become canonical source history.
+.runtime/
+state/
+logs/
+*.pid
+
+# Local secrets/credentials.
+.env
+.env.*
+secrets/
+*.key
+*.pem

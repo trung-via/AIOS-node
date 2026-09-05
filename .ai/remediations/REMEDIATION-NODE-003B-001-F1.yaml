@@ -1,0 +1,10 @@
+finding_id: F1
+action: CODE_FIX
+reviewed_sha: 0707084f5bf46371e8e3eef832ce4708b1cd0f37
+modification_scope:
+  - deploy/termux/bootstrap/start-services.sh
+  - tests/test_android_bootstrap.py
+affected_verification:
+  - python -m unittest discover -s tests -p 'test_*.py'
+  - python -m compileall -q src tests
+  - git diff --check

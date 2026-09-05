@@ -3,7 +3,7 @@
 **Status:** ACTIVE QUALIFICATION  
 **Project:** AIOS-node  
 **Target host:** Xiaomi Mi 10 Pro / native Termux  
-**Canonical source baseline:** `442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e`  
+**Reviewed NODE-002 implementation anchor:** `442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e`  
 **Pinned AIOS-renew executable:** `$HOME/.venvs/aios-renew-5bdaa603/bin/aios`  
 **Antigravity executable:** `$PREFIX/bin/agy`
 
@@ -20,7 +20,7 @@ The qualification may mutate only host-local deployment/configuration state. It 
 Before qualification:
 
 - AIOS-node repository exists at `$HOME/AIOS-node` on the Mi 10 Pro.
-- `origin/main` contains NODE-002 at `442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e` or a later reviewed descendant that has not changed the N4 contract.
+- `origin/main` contains NODE-002 at `442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e` or a later reviewed descendant that has not changed the N4 service adapter.
 - pinned AIOS-renew remains available at `$HOME/.venvs/aios-renew-5bdaa603/bin/aios`.
 - Antigravity remains available at `$PREFIX/bin/agy`.
 - Termux is the native GitHub-source installation already qualified in N1/N2.
@@ -64,7 +64,14 @@ git fetch origin main
 git checkout main
 git merge --ff-only origin/main
 
-test "$(git rev-parse HEAD)" = "442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e"
+# Product main may contain later Brain-owned documentation commits. Bind deployment
+# to the reviewed NODE-002 implementation by ancestry and exact service blob instead
+# of requiring HEAD itself to equal the implementation commit.
+git merge-base --is-ancestor \
+  442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e HEAD
+
+test "$(git rev-parse HEAD:deploy/termux/services/aios-node/run)" = \
+  "$(git rev-parse 442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e:deploy/termux/services/aios-node/run)"
 
 python -m pip install -e "$HOME/AIOS-node"
 

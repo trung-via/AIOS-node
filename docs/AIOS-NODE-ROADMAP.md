@@ -1,0 +1,240 @@
+# AIOS-node Roadmap
+
+**Status:** ACTIVE ROADMAP  
+**Project:** AIOS-node  
+**First target:** Xiaomi Mi 10 Pro / Termux
+
+## North Star
+
+```text
+Verified Useful Work / (Time + Tokens + Human Effort)
+```
+
+AIOS-node is intentionally a deterministic host/transport layer. It must not grow into a
+second AIOS Runtime or orchestration authority.
+
+## Required sequence
+
+### N0 — Governance Baseline — READY TO COMMIT
+
+Deliver:
+- `AIOS-NODE-CONSTITUTION.md`
+- `AIOS-NODE-BOUNDARY.md`
+- `CHATGPT_PROJECT_CONTRACT.md`
+- this roadmap
+- README
+
+Gate:
+- project authority is explicit before production code exists;
+- one-way dependency on AIOS-renew is fixed;
+- architectural prohibitions are recorded.
+
+### N1 — Mi 10 Pro Host Preflight
+
+Goal:
+Prove the Mi 10 Pro / Termux host has the minimum mechanics required to host AIOS without
+changing AIOS-renew semantics.
+
+Inspect/measure:
+- ARM64 / aarch64 architecture;
+- Python >= 3.11;
+- Git;
+- POSIX shell resolution;
+- strict UTF-8 behavior;
+- filesystem read/write/rename behavior in Termux private storage;
+- `fcntl.flock()` support;
+- subprocess execution;
+- network/DNS/TLS;
+- available disk/RAM;
+- `agy` binary availability and basic non-production invocation;
+- background/battery constraints relevant to later persistence.
+
+Non-goals:
+- no AIOS RUN yet;
+- no GitHub Actions runner;
+- no persistent daemon;
+- no automatic fixes to AIOS-renew.
+
+Gate:
+Produce a deterministic preflight report with PASS/FAIL/UNKNOWN host capabilities.
+
+If an actual AIOS-renew portability defect is observed, record exact evidence and open a
+separate upstream AIOS-renew TASK rather than adding competing behavior to AIOS-node.
+
+### N2 — Pinned AIOS-renew Compatibility
+
+Goal:
+Install and bind AIOS-node development to an explicit AIOS-renew commit/version and prove
+the approved operator surface can be invoked on the Mi 10 Pro.
+
+Requirements:
+- explicit upstream pin;
+- no assumption that AIOS current main equals Node-compatible runtime;
+- no target-repository mutation outside approved AIOS surfaces.
+
+Gate:
+`aios` is callable on the Mi 10 Pro against a disposable repository without architecture drift.
+
+### N3 — Disposable End-to-End Execution Proof
+
+Goal:
+Prove one canonical AIOS execution on a disposable smoke repository using Antigravity through
+AIOS-renew.
+
+Required flow:
+```text
+bounded local request
+  ↓
+AIOS-node bootstrap surface
+  ↓
+approved `aios ...` operator command
+  ↓
+AIOS-renew
+  ↓
+Antigravity
+  ↓
+Runtime verification
+  ↓
+canonical RESULT / FAILURE
+```
+
+Hard constraints:
+- Node does not invoke `agy` directly for production execution;
+- Node does not run canonical verification separately;
+- Node does not publish or repair.
+
+Gate:
+A complete attributable execution exists with no duplicate authority.
+
+### N4 — Persistent Host
+
+Goal:
+Keep AIOS-node available across normal Android lifecycle events.
+
+Target mechanisms:
+- Termux native service supervision;
+- boot restart;
+- explicit host state: READY / BUSY / DEGRADED / OFFLINE.
+
+Non-goals:
+- no remote wakeup yet;
+- no autonomous execution retry.
+
+Gate:
+reboot → service restart → READY, with no invented engineering state.
+
+### N5 — Bounded Request Contract
+
+Goal:
+Define the only remote data AIOS-node is permitted to accept.
+
+V1 request payload should contain bounded identifiers such as:
+- request_id;
+- repository_id / configured repository alias;
+- operation;
+- task_id;
+- selected executor;
+- optional finding_id or failed_run_id only when that operation is later explicitly enabled.
+
+Forbidden:
+- arbitrary shell;
+- arbitrary command text;
+- executable scripts supplied by caller.
+
+Initial enabled operation:
+- PRIMARY only, unless later evidence justifies expansion.
+
+Gate:
+invalid/unrecognized/unbounded requests fail before AIOS invocation.
+
+### N6 — Private Remote Wakeup
+
+Goal:
+Allow a remote Human/Brain control-plane event to wake one Mi 10 Pro node.
+
+Architecture:
+```text
+private control plane
+  ↓
+bounded request
+  ↓
+Mi 10 Pro
+  ↓
+AIOS-node
+```
+
+Security:
+- do not attach persistent self-hosted execution to an untrusted public workflow surface;
+- minimum credentials;
+- control-plane credentials separated from publication authority.
+
+Gate:
+one authorized remote request produces at most one approved AIOS invocation.
+
+### N7 — Durable Request Identity
+
+Goal:
+Make duplicate transport events deterministic no-ops without pretending to own AIOS mutation leases.
+
+Persistent operational journal:
+- request_id;
+- received state;
+- target repo alias;
+- operation;
+- task id;
+- selected executor;
+- associated process/run observation when known.
+
+Gate:
+same request delivered twice does not start two canonical executions.
+
+### N8 — Crash / Reboot Reconciliation
+
+Goal:
+After host/process loss, reconnect operational request identity to canonical AIOS state.
+
+Allowed:
+- inspect canonical repository state;
+- report known terminal state;
+- report active/uncertain/recovery-required state.
+
+Forbidden:
+- automatic replacement PRIMARY;
+- automatic REMEDIATION;
+- automatic REPAIR;
+- automatic publication.
+
+Gate:
+crash/reboot never causes silent duplicate mutation.
+
+### N9 — Reliability / Soak Gate
+
+Required scenarios:
+- screen off;
+- reboot;
+- Wi-Fi → mobile data;
+- mobile data → Wi-Fi;
+- network loss and recovery;
+- Android kills/suspends service;
+- remote duplicate event;
+- long Antigravity execution;
+- host restart during execution;
+- stale request;
+- low storage / low battery observation where practical.
+
+Completion criterion:
+Mi 10 Pro can reliably receive an authorized bounded request, invoke exactly one canonical
+AIOS execution through the approved operator surface, survive normal mobile-host lifecycle
+events without duplicating execution, and expose enough operational state for deterministic
+reconciliation.
+
+## Deferred until after v1
+
+- Codex-on-Android parity;
+- laptop host parity hardening;
+- multi-node routing;
+- capability-based scheduler;
+- autonomous repair/recovery;
+- generalized agent orchestration.
+
+None of these block AIOS-node v1.

@@ -13,9 +13,19 @@ Verified Useful Work / (Time + Tokens + Human Effort)
 AIOS-node is intentionally a deterministic host/transport layer. It must not grow into a
 second AIOS Runtime or orchestration authority.
 
+## Current state
+
+```text
+N0 Governance Baseline             DONE
+N1 Mi 10 Pro Host Preflight        DONE
+N2 Pinned AIOS-renew Compatibility NEXT
+```
+
+N1 canonical report: [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md)
+
 ## Required sequence
 
-### N0 — Governance Baseline — READY TO COMMIT
+### N0 — Governance Baseline — DONE
 
 Deliver:
 - `AIOS-NODE-CONSTITUTION.md`
@@ -29,7 +39,9 @@ Gate:
 - one-way dependency on AIOS-renew is fixed;
 - architectural prohibitions are recorded.
 
-### N1 — Mi 10 Pro Host Preflight
+Result: PASS.
+
+### N1 — Mi 10 Pro Host Preflight — DONE
 
 Goal:
 Prove the Mi 10 Pro / Termux host has the minimum mechanics required to host AIOS without
@@ -58,10 +70,13 @@ Non-goals:
 Gate:
 Produce a deterministic preflight report with PASS/FAIL/UNKNOWN host capabilities.
 
-If an actual AIOS-renew portability defect is observed, record exact evidence and open a
-separate upstream AIOS-renew TASK rather than adding competing behavior to AIOS-node.
+Result: PASS. See [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md).
 
-### N2 — Pinned AIOS-renew Compatibility
+Observed compatibility concern deferred to N2: native Termux resolves `sh` under the Termux
+prefix rather than `/bin/sh`. This is not yet a proven AIOS-renew defect; N2 must reproduce
+any incompatibility against the exact pinned upstream runtime before proposing a kernel change.
+
+### N2 — Pinned AIOS-renew Compatibility — NEXT
 
 Goal:
 Install and bind AIOS-node development to an explicit AIOS-renew commit/version and prove
@@ -70,7 +85,10 @@ the approved operator surface can be invoked on the Mi 10 Pro.
 Requirements:
 - explicit upstream pin;
 - no assumption that AIOS current main equals Node-compatible runtime;
-- no target-repository mutation outside approved AIOS surfaces.
+- no target-repository mutation outside approved AIOS surfaces;
+- production Antigravity installation must be pinned and provenance-aware;
+- compatibility proof must use a disposable repository;
+- any portability failure must be reproduced against the pinned runtime before proposing an upstream change.
 
 Gate:
 `aios` is callable on the Mi 10 Pro against a disposable repository without architecture drift.

@@ -379,11 +379,33 @@ class TestBootstrapScriptStaticContract(unittest.TestCase):
             pass
 
     def test_script_deterministic_environment(self) -> None:
-        """AC4: Establishes PREFIX, SVDIR, LOGDIR deterministically."""
+        """AC4: Establishes PREFIX, SVDIR, LOGDIR deterministically and exports them."""
         self.assertIn('PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"', self.content)
         self.assertIn('HOME="${HOME:-/data/data/com.termux/files/home}"', self.content)
         self.assertIn('SVDIR="${SVDIR:-$PREFIX/var/service}"', self.content)
         self.assertIn('LOGDIR="${LOGDIR:-$HOME/.aios-node/logs}"', self.content)
+
+        # Environment must be exported before exec'ing service-daemon so the new process inherits them
+        daemon_exec_indices = [
+            i for i, line in enumerate(self.executable_lines) if "service-daemon" in line
+        ]
+        self.assertTrue(daemon_exec_indices, "service-daemon invocation not found in executable lines")
+        daemon_idx = daemon_exec_indices[0]
+
+        exported_vars = set()
+        for line in self.executable_lines[:daemon_idx]:
+            match = re.match(r"^export\s+(.+)$", line)
+            if match:
+                for token in match.group(1).split():
+                    var_name = token.split("=")[0]
+                    exported_vars.add(var_name)
+
+        for required_var in ("PREFIX", "SVDIR", "LOGDIR", "HOME"):
+            self.assertIn(
+                required_var,
+                exported_vars,
+                f"Environment variable {required_var} must be exported before service-daemon start",
+            )
 
     def test_script_invokes_service_daemon_start_once(self) -> None:
         """AC4 & Constraint 10: Invokes service-daemon start exactly once via exec."""

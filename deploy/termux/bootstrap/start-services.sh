@@ -13,6 +13,8 @@ SVDIR="${SVDIR:-$PREFIX/var/service}"
 LOGDIR="${LOGDIR:-$HOME/.aios-node/logs}"
 MARKER_DIR="${MARKER_DIR:-$HOME/.aios-node/bootstrap/markers}"
 
+export PREFIX HOME SVDIR LOGDIR
+
 mkdir -p "$LOGDIR" "$MARKER_DIR"
 
 BOOT_ID=""

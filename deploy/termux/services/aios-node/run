@@ -1,0 +1,19 @@
+#!/data/data/com.termux/files/usr/bin/sh
+exec 2>&1
+
+# AIOS-node Termux runit service adapter (N4 / NODE-002)
+# Supervises host process availability only.
+# Does not own AIOS execution, retries, or verification.
+
+PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+HOME="${HOME:-/data/data/com.termux/files/home}"
+
+AIOS_NODE_BIN="${AIOS_NODE_BIN:-$PREFIX/bin/aios-node}"
+AIOS_NODE_STATE_DIR="${AIOS_NODE_STATE_DIR:-$HOME/.aios-node/state}"
+AIOS_NODE_AIOS_BIN="${AIOS_NODE_AIOS_BIN:-${AIOS_BIN:-$HOME/.venvs/aios-renew-5bdaa603/bin/aios}}"
+AIOS_NODE_ANTIGRAVITY_BIN="${AIOS_NODE_ANTIGRAVITY_BIN:-${ANTIGRAVITY_BIN:-${AGY_BIN:-$PREFIX/bin/agy}}}"
+
+exec "$AIOS_NODE_BIN" host \
+    --state-dir "$AIOS_NODE_STATE_DIR" \
+    --aios-bin "$AIOS_NODE_AIOS_BIN" \
+    --antigravity-bin "$AIOS_NODE_ANTIGRAVITY_BIN"

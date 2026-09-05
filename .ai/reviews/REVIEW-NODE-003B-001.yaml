@@ -1,0 +1,30 @@
+review_id: REVIEW-NODE-003B-001
+reviewed_sha: 0707084f5bf46371e8e3eef832ce4708b1cd0f37
+mode: PRIMARY
+verdict: CHANGES_REQUIRED
+acceptance:
+  AC1: PASS
+  AC2: PASS
+  AC3: PASS
+  AC4: FAIL
+  AC5: PASS
+  AC6: PASS
+  AC7: PASS
+  AC8: PASS
+findings:
+  - id: F1
+    basis: AC4
+    action: CODE_FIX
+    location: deploy/termux/bootstrap/start-services.sh
+    issue: >
+      The bootstrap assigns PREFIX, HOME, SVDIR, and LOGDIR as shell variables but does not
+      export the service environment before exec'ing service-daemon. service-daemon is a new
+      process and reads PREFIX and SVDIR from its process environment; in particular SVDIR is
+      not guaranteed to be inherited from a Termux app-shell invocation. The current static test
+      only checks assignment text, so it can pass while service-daemon receives no SVDIR and
+      fails to supervise $PREFIX/var/service after cold boot.
+    expected: >
+      Export the deterministic Termux service environment before invoking service-daemon
+      (at minimum PREFIX, SVDIR, and LOGDIR; preserve HOME as needed), and strengthen the
+      standard-library static contract test so a future non-exported environment regression
+      fails. Keep the bootstrap one-shot and preserve all existing NODE-003B authority bounds.

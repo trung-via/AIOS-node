@@ -64,14 +64,16 @@ constraints:
   hard:
     - The Android helper must be a standalone package with its own application id and must not
       declare android:sharedUserId or use Termux signing material.
-    - AndroidManifest.xml may request only the minimum permissions needed for this boundary:
+    - >
+      AndroidManifest.xml may request only the minimum permissions needed for this boundary:
       android.permission.RECEIVE_BOOT_COMPLETED and com.termux.permission.RUN_COMMAND; it must not
       request INTERNET, storage, accessibility, device-admin, VPN, package-install, root, or wake-lock permissions.
     - The BOOT_COMPLETED receiver must be non-exported and must perform at most one fixed dispatch
       per received boot broadcast; no retry loop, scheduler, alarm, worker, polling, or delayed redelivery is allowed.
     - The fixed dispatch target must be explicit Termux component
       com.termux/com.termux.app.RunCommandService with action com.termux.RUN_COMMAND.
-    - The helper must pass one compile-time constant command path only:
+    - >
+      The helper must pass one compile-time constant command path only:
       /data/data/com.termux/files/home/.aios-node/bootstrap/start-services.sh.
       No Intent extra, UI field, file, network payload, clipboard value, or external input may alter
       command path, command arguments, Termux component, or action.

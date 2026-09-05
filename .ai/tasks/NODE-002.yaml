@@ -1,0 +1,99 @@
+task_id: NODE-002
+revision: 1
+
+goal: >
+  Add a thin Termux runit service adapter that supervises only the AIOS-node host process
+  and preserves the strict authority boundary proven by NODE-001 and N3.
+
+problem: >
+  NODE-001 implemented a portable non-polling host core, but the Mi 10 Pro still has no
+  repository-owned Termux service definition that runit can supervise. N4 now needs the
+  smallest device-specific adapter possible before any on-device boot/restart proof.
+
+assumptions:
+  - NODE-001 passed and was published at aff7f49f546cb5a9f777ceeb4d58470e8fbbcecb.
+  - The Mi 10 Pro uses native Termux and the official termux-services package will be the
+    service supervisor during NODE-003 qualification.
+  - The established Mi 10 Pro layout includes a pinned AIOS-renew virtual environment at
+    $HOME/.venvs/aios-renew-5bdaa603 and Antigravity on the normal Termux PREFIX path.
+  - N4 is host lifecycle only; remote wakeup and request dispatch remain deferred.
+
+scope:
+  inspect:
+    - docs/AIOS-NODE-CONSTITUTION.md
+    - docs/AIOS-NODE-BOUNDARY.md
+    - docs/CHATGPT_PROJECT_CONTRACT.md
+    - docs/AIOS-NODE-ROADMAP.md
+    - docs/N4-PERSISTENT-HOST-PLAN.md
+    - pyproject.toml
+    - src/aios_node/cli.py
+    - src/aios_node/host.py
+    - tests/test_host.py
+  modify:
+    - deploy/termux/services/aios-node/run
+    - docs/N4-TERMUX-RUNIT-ADAPTER.md
+    - tests/test_termux_service.py
+
+non_goals:
+  - Install or start termux-services on a real device during this TASK.
+  - Add Termux:Boot integration or perform a reboot proof.
+  - Invoke AIOS-renew, Antigravity, Codex, GitHub Actions, or any coding Executor.
+  - Launch, supervise, restart, retry, or recover an AIOS RUN.
+  - Add remote request ingestion, polling, delivery dedupe, or crash reconciliation.
+  - Add a wake lock or power-management policy.
+  - Modify the portable host core semantics introduced by NODE-001.
+
+constraints:
+  hard:
+    - The runit service must supervise only the `aios-node host` process.
+    - The service run file must use the native Termux shell and replace itself with the host
+      process via `exec`; it must not contain a retry loop, polling loop, sleep loop, or child
+      supervisor of its own.
+    - The service run file must never invoke `aios run`, `aios remediate`, `aios repair`,
+      `agy`, `codex`, Git mutation commands, target-project verification, network requests,
+      publication, or any model call.
+    - AIOS-renew and Antigravity paths supplied to `aios-node host` are readiness-probe inputs
+      only; this adapter must not execute those binaries.
+    - The adapter may contain Termux-specific paths because it is a thin host adapter, but no
+      Termux path or service policy may be moved into `src/aios_node` by this TASK.
+    - The service must provide deterministic defaults for the proven Mi 10 Pro layout while
+      permitting host-local environment overrides for the AIOS-node executable, state directory,
+      pinned AIOS executable, and Antigravity executable.
+    - The service run file must not enable or disable itself and must not call `sv`, `sv-enable`,
+      `sv-disable`, Termux:Boot, or `termux-wake-lock`; lifecycle activation belongs to NODE-003.
+    - The committed run file must have executable Git mode.
+    - Documentation must state explicitly that runit may restart the AIOS-node host process
+      after host-process exit but must never be treated as authority to restart canonical AIOS work.
+
+acceptance:
+  - id: AC1
+    condition: >
+      `deploy/termux/services/aios-node/run` is an executable native-Termux runit run file that
+      uses `exec` to start exactly one `aios-node host` process and contains no internal restart
+      or polling loop.
+  - id: AC2
+    condition: >
+      The adapter exposes deterministic environment-overridable paths for the AIOS-node
+      executable, host-state directory, pinned AIOS-renew executable, and Antigravity executable,
+      and passes the latter two only as bounded readiness configuration to the host CLI.
+  - id: AC3
+    condition: >
+      Static contract tests prove the service adapter contains no direct Executor invocation,
+      canonical AIOS operation, Git mutation, project verification, network/model call, wake lock,
+      service enable/disable action, or autonomous retry mechanism.
+  - id: AC4
+    condition: >
+      `docs/N4-TERMUX-RUNIT-ADAPTER.md` documents the exact deployment destination under
+      `$PREFIX/var/service/aios-node`, the configuration boundary, the NODE-003 activation step,
+      and the rule that runit supervises only host availability rather than engineering execution.
+  - id: AC5
+    condition: >
+      The existing NODE-001 test suite remains green and new standard-library tests validate the
+      Termux adapter contract deterministically on non-Termux development hosts without invoking
+      shell scripts, models, network calls, AIOS, or Executors.
+
+verification:
+  required:
+    - python -m unittest discover -s tests -p 'test_*.py'
+    - python -m compileall -q src tests
+    - git diff --check

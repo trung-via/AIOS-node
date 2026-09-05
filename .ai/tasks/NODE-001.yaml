@@ -1,0 +1,92 @@
+task_id: NODE-001
+revision: 1
+
+goal: >
+  Create the first production AIOS-node package as a portable, non-polling host-lifecycle
+  process that can report bounded operational readiness without acquiring any AIOS-renew
+  execution, repository, verification, review, or recovery authority.
+
+problem: >
+  N3 proved the Mi 10 Pro can execute one canonical AIOS PRIMARY through AIOS-renew, but
+  AIOS-node still has no production host process that can be supervised persistently. N4
+  requires a minimal platform-neutral host core before adding a thin Termux runit adapter.
+
+assumptions:
+  - N0 through N3 are canonically closed and N4 is the active roadmap phase.
+  - AIOS-node may own host lifecycle and host-local readiness observations only.
+  - The Termux service adapter and boot integration will be separate later tasks.
+  - Python 3.11 or newer is the portable minimum runtime.
+
+scope:
+  inspect:
+    - docs/AIOS-NODE-CONSTITUTION.md
+    - docs/AIOS-NODE-BOUNDARY.md
+    - docs/CHATGPT_PROJECT_CONTRACT.md
+    - docs/AIOS-NODE-ROADMAP.md
+    - docs/N4-PERSISTENT-HOST-PLAN.md
+    - README.md
+  modify:
+    - pyproject.toml
+    - src/aios_node/__init__.py
+    - src/aios_node/cli.py
+    - src/aios_node/host.py
+    - tests/test_host.py
+
+non_goals:
+  - Invoke AIOS-renew, Antigravity, Codex, or any coding Executor.
+  - Parse TASK, RUN, RESULT, FAILURE, REVIEW, REMEDIATION, REPAIR, or target-repository state.
+  - Run Git synchronization, repository mutation, or target-project verification.
+  - Add remote request ingestion, GitHub Actions, polling transport, request dedupe, or retry.
+  - Add Termux-specific paths, runit service files, Termux:Boot integration, or wake locks.
+  - Emit BUSY or OFFLINE as locally asserted N4 host states.
+
+constraints:
+  hard:
+    - The production package must have no runtime dependency on AIOS-renew and must not import aios_renew.
+    - Host dependency probes may inspect configured executable paths but must not execute those binaries.
+    - N4 host core may emit only READY or DEGRADED; BUSY is reserved for later bounded dispatch and OFFLINE is externally inferred.
+    - Host state is operational only and must not contain or infer engineering PASS, FAIL, review, verification, or publication semantics.
+    - State persistence must use strict UTF-8 JSON and an atomic same-directory replace so readers never observe a partially written snapshot.
+    - The host idle path must block without periodic polling, model calls, network calls, or child process execution.
+    - SIGINT and SIGTERM must permit deterministic graceful host shutdown without starting recovery work.
+    - Core behavior must remain platform-neutral and contain no hard-coded Android, Termux, Windows, or Linux installation paths.
+    - Use only Python standard-library runtime dependencies unless a dependency is strictly necessary and justified by the implementation.
+
+acceptance:
+  - id: AC1
+    condition: >
+      pyproject.toml defines an installable Python 3.11+ package and an `aios-node` console
+      entry point backed by the new package.
+  - id: AC2
+    condition: >
+      The host core deterministically derives READY when all configured executable dependencies
+      are executable, and DEGRADED with stable bounded reason codes when one or more are not.
+  - id: AC3
+    condition: >
+      Readiness probing never invokes AIOS-renew, Antigravity, Codex, Git, a model, a network
+      request, or project verification; it inspects only host-local executable availability and
+      state-storage capability.
+  - id: AC4
+    condition: >
+      Host state is persisted as strict UTF-8 JSON using atomic same-directory replacement and
+      contains an explicit schema version, operational state, bounded reasons, and process id
+      without canonical engineering fields.
+  - id: AC5
+    condition: >
+      The host process has a non-polling idle lifecycle and handles normal SIGINT/SIGTERM shutdown
+      without launching an AIOS RUN, Executor, retry, recovery, or other child work.
+  - id: AC6
+    condition: >
+      N4 core never locally emits BUSY or OFFLINE and contains no device-specific path or Termux
+      service policy; those concerns remain outside the portable core.
+  - id: AC7
+    condition: >
+      Standard-library unit tests cover READY, DEGRADED, atomic state persistence, bounded reason
+      behavior, and a deterministically stoppable idle lifecycle without real model/network/process
+      side effects.
+
+verification:
+  required:
+    - python -m unittest discover -s tests -p 'test_*.py'
+    - python -m compileall -q src
+    - git diff --check

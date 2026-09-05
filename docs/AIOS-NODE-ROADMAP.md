@@ -18,10 +18,12 @@ second AIOS Runtime or orchestration authority.
 ```text
 N0 Governance Baseline             DONE
 N1 Mi 10 Pro Host Preflight        DONE
-N2 Pinned AIOS-renew Compatibility NEXT
+N2 Pinned AIOS-renew Compatibility ACTIVE
 ```
 
 N1 canonical report: [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md)
+
+N2 canonical compatibility target: [`N2-AIOS-RENEW-PIN.md`](N2-AIOS-RENEW-PIN.md)
 
 ## Required sequence
 
@@ -76,7 +78,7 @@ Observed compatibility concern deferred to N2: native Termux resolves `sh` under
 prefix rather than `/bin/sh`. This is not yet a proven AIOS-renew defect; N2 must reproduce
 any incompatibility against the exact pinned upstream runtime before proposing a kernel change.
 
-### N2 — Pinned AIOS-renew Compatibility — NEXT
+### N2 — Pinned AIOS-renew Compatibility — ACTIVE
 
 Goal:
 Install and bind AIOS-node development to an explicit AIOS-renew commit/version and prove
@@ -89,6 +91,9 @@ Requirements:
 - production Antigravity installation must be pinned and provenance-aware;
 - compatibility proof must use a disposable repository;
 - any portability failure must be reproduced against the pinned runtime before proposing an upstream change.
+
+Pinned target:
+`5bdaa603924ac6104ed28413ad91a4cc1b7f6d0b`.
 
 Gate:
 `aios` is callable on the Mi 10 Pro against a disposable repository without architecture drift.

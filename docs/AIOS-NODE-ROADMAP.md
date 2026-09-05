@@ -35,7 +35,7 @@ N3 canonical report: [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md)
 
 N4 active plan: [`N4-PERSISTENT-HOST-PLAN.md`](N4-PERSISTENT-HOST-PLAN.md)
 
-N4 current implementation task: `.ai/tasks/NODE-001.yaml`.
+N4 current implementation task: `.ai/tasks/NODE-002.yaml`.
 
 ## Required sequence
 
@@ -162,9 +162,9 @@ Semantic refinement:
 - OFFLINE is inferred externally rather than self-authored by a dead process.
 
 Implementation sequence:
-- `NODE-001` — portable host core;
-- `NODE-002` — thin Termux runit service adapter;
-- `NODE-003` — boot/restart conformance.
+- `NODE-001` — portable host core — PASS / published at `aff7f49f546cb5a9f777ceeb4d58470e8fbbcecb`;
+- `NODE-002` — thin Termux runit service adapter — ACTIVE;
+- `NODE-003` — boot/restart conformance — NEXT.
 
 Non-goals:
 - no remote wakeup yet;

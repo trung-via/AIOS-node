@@ -1,0 +1,8 @@
+review_id: REVIEW-NODE-003B-002
+reviewed_sha: f4db260e6c31b0ecc120aca0c599dce4c1853ee7
+mode: DELTA
+verdict: PASS
+acceptance:
+  AC4: PASS
+findings: []
+prior_finding_id: F1

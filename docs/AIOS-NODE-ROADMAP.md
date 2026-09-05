@@ -19,7 +19,7 @@ second AIOS Runtime or orchestration authority.
 N0 Governance Baseline             DONE
 N1 Mi 10 Pro Host Preflight        DONE
 N2 Pinned AIOS-renew Compatibility DONE
-N3 Disposable End-to-End Proof     NEXT
+N3 Disposable End-to-End Proof     ACTIVE
 ```
 
 N1 canonical report: [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md)
@@ -27,6 +27,8 @@ N1 canonical report: [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md
 N2 canonical compatibility target: [`N2-AIOS-RENEW-PIN.md`](N2-AIOS-RENEW-PIN.md)
 
 N2 canonical report: [`N2-MI10-COMPATIBILITY-REPORT.md`](N2-MI10-COMPATIBILITY-REPORT.md)
+
+N3 execution plan: [`N3-DISPOSABLE-E2E-PLAN.md`](N3-DISPOSABLE-E2E-PLAN.md)
 
 ## Required sequence
 
@@ -77,7 +79,9 @@ Produce a deterministic preflight report with PASS/FAIL/UNKNOWN host capabilitie
 
 Result: PASS. See [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md).
 
-The N1 `/bin/sh` compatibility concern was tested in N2 and cleared for this specific Mi 10 Pro / Termux host.
+Observed compatibility concern deferred to N2: native Termux resolves `sh` under the Termux
+prefix rather than `/bin/sh`. This is not yet a proven AIOS-renew defect; N2 must reproduce
+any incompatibility against the exact pinned upstream runtime before proposing a kernel change.
 
 ### N2 — Pinned AIOS-renew Compatibility — DONE
 
@@ -99,9 +103,9 @@ Pinned target:
 Gate:
 `aios` is callable on the Mi 10 Pro against a disposable repository without architecture drift.
 
-Result: PASS. The exact pin was installed in an isolated Python environment, Antigravity v1.1.27 was installed from the verified pinned payload, OAuth/headless invocation succeeded, `/bin/sh` subprocess compatibility was proven, and `aios task TASK-N2-SMOKE` successfully loaded and rendered a canonical TASK without entering execution. See [`N2-MI10-COMPATIBILITY-REPORT.md`](N2-MI10-COMPATIBILITY-REPORT.md).
+Result: PASS. See [`N2-MI10-COMPATIBILITY-REPORT.md`](N2-MI10-COMPATIBILITY-REPORT.md).
 
-### N3 — Disposable End-to-End Execution Proof — NEXT
+### N3 — Disposable End-to-End Execution Proof — ACTIVE
 
 Goal:
 Prove one canonical AIOS execution on a disposable smoke repository using Antigravity through
@@ -131,6 +135,8 @@ Hard constraints:
 
 Gate:
 A complete attributable execution exists with no duplicate authority.
+
+Active bounded plan: [`N3-DISPOSABLE-E2E-PLAN.md`](N3-DISPOSABLE-E2E-PLAN.md).
 
 ### N4 — Persistent Host
 

@@ -35,7 +35,7 @@ N3 canonical report: [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md)
 
 N4 active plan: [`N4-PERSISTENT-HOST-PLAN.md`](N4-PERSISTENT-HOST-PLAN.md)
 
-N4 current implementation task: `.ai/tasks/NODE-002.yaml`.
+N4 active qualification: [`N4-NODE-003-QUALIFICATION-PROTOCOL.md`](N4-NODE-003-QUALIFICATION-PROTOCOL.md).
 
 ## Required sequence
 
@@ -161,10 +161,12 @@ Semantic refinement:
 - BUSY is reserved for later bounded dispatch;
 - OFFLINE is inferred externally rather than self-authored by a dead process.
 
-Implementation sequence:
+Implementation / qualification sequence:
 - `NODE-001` — portable host core — PASS / published at `aff7f49f546cb5a9f777ceeb4d58470e8fbbcecb`;
-- `NODE-002` — thin Termux runit service adapter — ACTIVE;
-- `NODE-003` — boot/restart conformance — NEXT.
+- `NODE-002` — thin Termux runit service adapter — PASS / published at `442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e`;
+- `NODE-003` — physical Mi 10 Pro boot/restart conformance — ACTIVE.
+
+`NODE-003` is an on-device qualification boundary, not a coding-Executor implementation RUN. A coding Executor cannot truthfully attest a physical Android reboot. PASS requires direct device evidence under [`N4-NODE-003-QUALIFICATION-PROTOCOL.md`](N4-NODE-003-QUALIFICATION-PROTOCOL.md).
 
 Non-goals:
 - no remote wakeup yet;

@@ -1,6 +1,6 @@
 # N3 — Disposable End-to-End Execution Plan
 
-**Status:** ACTIVE  
+**Status:** PASS  
 **Project:** AIOS-node  
 **Target host:** Xiaomi Mi 10 Pro / native Termux  
 **Pinned AIOS-renew:** `5bdaa603924ac6104ed28413ad91a4cc1b7f6d0b`
@@ -123,3 +123,16 @@ A reproduced host/runtime defect is classified first; only then may a narrow ups
 - no crash reconciliation;
 - no Codex Android parity;
 - no AIOS-node production executor wrapper.
+
+## Result
+
+PASS. Canonical execution:
+
+```text
+RUN-N3-SMOKE-001
+base_sha: b27c7aeb4f1ca8c3b222400adb17df435d32da40
+head_sha: 570da336cb2959e98f162753f116c2c61f160677
+executor: antigravity
+```
+
+See [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md) for the attributable evidence and authority audit.

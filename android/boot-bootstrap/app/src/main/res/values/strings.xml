@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AIOS Boot Bootstrap</string>
+    <string name="title_bootstrap_setup">AIOS Cold-Boot Bootstrap Setup</string>
+    <string name="header_permission">Termux RUN_COMMAND Permission</string>
+    <string name="status_perm_granted">Status: GRANTED (helper authorized to invoke RunCommandService)</string>
+    <string name="status_perm_not_granted">Status: NOT GRANTED (grant required for cold-boot dispatch)</string>
+    <string name="btn_request_permission">Request RUN_COMMAND Permission</string>
+    <string name="header_diagnostics">Operational Boot Diagnostics</string>
+    <string name="label_last_boot">Last BOOT_COMPLETED received: %1$s</string>
+    <string name="label_last_dispatch">Last RunCommand dispatch: %1$s</string>
+    <string name="label_last_result">Last dispatch result: %1$s</string>
+    <string name="label_last_error">Last error: %1$s</string>
+    <string name="header_prerequisites">Host Qualification Prerequisites</string>
+    <string name="text_prerequisites">1. Termux external apps configuration:\n   Add allow-external-apps=true to ~/.termux/termux.properties.\n   Security note: Grant RUN_COMMAND permission ONLY to this bounded helper.\n\n2. Xiaomi MIUI background settings:\n   - Autostart: ENABLED for Termux and AIOS Boot Bootstrap.\n   - Battery saver: NO RESTRICTIONS for both apps.\n\n3. Bootstrap script deployment:\n   Ensure start-services.sh is deployed to:\n   ~/.aios-node/bootstrap/start-services.sh\n\n4. Physical cold-boot verification:\n   Reboot the device to complete physical qualification. Source completion alone does not mark N4 PASS.</string>
+</resources>

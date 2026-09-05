@@ -1,6 +1,6 @@
 # N2 — Pinned AIOS-renew Compatibility Target
 
-**Status:** ACTIVE  
+**Status:** PASS / COMPLETE  
 **AIOS-node phase:** N2  
 **Target host:** Xiaomi Mi 10 Pro / native Termux
 
@@ -26,7 +26,7 @@ Commit message:
 task: rebase TASK-058 historical recovery on current canonical state
 ```
 
-N2 compatibility evidence must be attributed to this exact commit. A later AIOS-renew `main` advance does not silently change this compatibility target.
+N2 compatibility evidence is attributed to this exact commit. A later AIOS-renew `main` advance does not silently change this compatibility target.
 
 ## Declared runtime requirements at the pin
 
@@ -37,9 +37,9 @@ Python >= 3.11
 PyYAML >= 6.0,<7
 ```
 
-N1 observed Python 3.14.6 on the Mi 10 Pro, satisfying the declared Python version floor. Actual package installation remains an N2 evidence step.
+N2 installed the exact pin successfully inside a dedicated Termux virtual environment using Python 3.14.6 and PyYAML 6.0.3.
 
-## Known compatibility concern to reproduce
+## Verification-shell concern — cleared on this host
 
 At the pinned commit, `src/aios_renew/verification.py` uses:
 
@@ -49,38 +49,60 @@ return ("/bin/sh", "-c", command)
 
 for non-Windows verification execution.
 
-N1 observed native Termux resolving `sh` as:
+N1 observed native Termux resolving ordinary `sh` as:
 
 ```text
 /data/data/com.termux/files/usr/bin/sh
 ```
 
-N2 must establish whether `/bin/sh` exists on the real host and, if absent, reproduce the resulting verification-start failure against this exact pinned runtime before proposing any AIOS-renew portability change.
+N2 then proved on the real Mi 10 Pro host that:
 
-This observation does not authorize AIOS-node to implement a competing verification layer or shell fallback.
+```text
+/bin/sh exists and is executable
+Python subprocess(['/bin/sh','-c','printf BIN_SH_EXEC_OK']) -> RC=0
+stdout -> b'BIN_SH_EXEC_OK'
+stderr -> b''
+```
 
-## N2 bounded sequence
+Therefore the concern is **cleared for this specific host/runtime combination** and no upstream AIOS-renew portability change is authorized by current evidence.
 
-1. Confirm `/bin/sh` presence/absence on the host.
-2. Confirm `pip` availability.
-3. Install AIOS-renew from the exact pinned commit into a dedicated Termux virtual environment or otherwise isolated Python environment.
-4. Prove the `aios` entry point resolves and reports/help-loads without performing a canonical RUN.
-5. Install the already-verified Antigravity v1.1.27 twin binaries into the normal Termux executable path using the pinned payload verified during N1.
-6. Prove `agy --version` from the normal PATH.
-7. Use a disposable repository to reproduce or clear the pinned verification-shell compatibility concern.
-8. Record exact evidence. If a genuine upstream defect is reproduced, stop and open a narrow AIOS-renew portability TASK; do not work around it inside AIOS-node.
+This does not claim universal Android/Termux portability across other hosts.
 
-## Hard boundaries
+## Completed N2 sequence
 
-N2 must not:
+1. `/bin/sh` presence and execution verified.
+2. `pip` availability verified.
+3. AIOS-renew installed from the exact pinned commit into `$HOME/.venvs/aios-renew-5bdaa603`.
+4. `aios --help` loaded successfully without a canonical RUN.
+5. Antigravity v1.1.27 twin binaries installed from the N1 hash-verified pinned payload.
+6. `agy --version` resolved from normal Termux PATH and reported `1.1.27`.
+7. Google OAuth authentication completed and cached.
+8. Headless Antigravity invocation succeeded with Gemini 3.8 Flash / high.
+9. A disposable Git repository was created at `$HOME/aios-node-smoke`.
+10. The pinned AIOS operator loaded and rendered `TASK-N2-SMOKE` via `aios task` without entering execution.
+11. Exact installed AIOS provenance was verified through Python distribution metadata: both `commit_id` and `requested_revision` equal the pinned commit.
+
+Canonical evidence report: [`N2-MI10-COMPATIBILITY-REPORT.md`](N2-MI10-COMPATIBILITY-REPORT.md).
+
+## Hard boundaries preserved
+
+N2 did not:
 
 - run a production project TASK;
+- admit an AIOS RUN;
 - add an AIOS-node verification implementation;
 - retry or repair canonical AIOS executions;
-- modify target repository state outside an explicitly approved disposable compatibility proof;
-- install from moving `latest`/`dev` sources when a pinned artifact is available;
-- silently move the AIOS-renew pin.
+- modify target repository state outside the approved disposable compatibility proof;
+- install Antigravity from moving `latest`/`dev` sources;
+- silently move the AIOS-renew pin;
+- trust the entire Termux `$HOME` to the executor.
 
 ## Gate
 
-N2 passes only when the pinned AIOS-renew operator surface is installable/callable on the Mi 10 Pro and any host incompatibility is deterministically classified without authority overlap.
+N2 gate:
+
+> The pinned AIOS-renew operator surface is installable/callable on the Mi 10 Pro and any host incompatibility is deterministically classified without authority overlap.
+
+Result: **PASS**.
+
+Next phase: **N3 — Disposable End-to-End Execution Proof**.

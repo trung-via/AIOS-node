@@ -20,7 +20,7 @@ N0 Governance Baseline             DONE
 N1 Mi 10 Pro Host Preflight        DONE
 N2 Pinned AIOS-renew Compatibility DONE
 N3 Disposable End-to-End Proof     DONE
-N4 Persistent Host                 ACTIVE
+N4 Persistent Host                 ACTIVE / BLOCKED AT BOOT DELIVERY
 ```
 
 N1 canonical report: [`N1-MI10-PREFLIGHT-REPORT.md`](N1-MI10-PREFLIGHT-REPORT.md)
@@ -36,6 +36,8 @@ N3 canonical report: [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md)
 N4 active plan: [`N4-PERSISTENT-HOST-PLAN.md`](N4-PERSISTENT-HOST-PLAN.md)
 
 N4 active qualification: [`N4-NODE-003-QUALIFICATION-PROTOCOL.md`](N4-NODE-003-QUALIFICATION-PROTOCOL.md).
+
+N4 current blocker evidence: [`N4-MI10-BOOT-BLOCKER.md`](N4-MI10-BOOT-BLOCKER.md).
 
 ## Required sequence
 
@@ -145,7 +147,7 @@ A complete attributable execution exists with no duplicate authority.
 
 Result: PASS via `RUN-N3-SMOKE-001`. See [`N3-MI10-E2E-REPORT.md`](N3-MI10-E2E-REPORT.md).
 
-### N4 — Persistent Host — ACTIVE
+### N4 — Persistent Host — ACTIVE / BLOCKED AT BOOT DELIVERY
 
 Goal:
 Keep AIOS-node available across normal Android lifecycle events.
@@ -164,9 +166,12 @@ Semantic refinement:
 Implementation / qualification sequence:
 - `NODE-001` — portable host core — PASS / published at `aff7f49f546cb5a9f777ceeb4d58470e8fbbcecb`;
 - `NODE-002` — thin Termux runit service adapter — PASS / published at `442b4bbdb2e36c1ef72d3b4248f1762a4c669a4e`;
-- `NODE-003` — physical Mi 10 Pro boot/restart conformance — ACTIVE.
+- `NODE-003` — physical Mi 10 Pro boot/restart conformance — BLOCKED at Android cold-boot delivery;
+- `NODE-003B` — Mi 10 Pro boot bootstrap fallback — NEXT DESIGN BOUNDARY.
 
-`NODE-003` is an on-device qualification boundary, not a coding-Executor implementation RUN. A coding Executor cannot truthfully attest a physical Android reboot. PASS requires direct device evidence under [`N4-NODE-003-QUALIFICATION-PROTOCOL.md`](N4-NODE-003-QUALIFICATION-PROTOCOL.md).
+`NODE-003` is an on-device qualification boundary, not a coding-Executor implementation RUN. Physical evidence proved normal runit startup, `READY`, and deterministic supervisor restart with a new PID. Repeated real Android reboots also proved a host-specific boot-delivery blocker: Termux:Boot scripts, including a minimal canary, were not executed despite Termux and Termux:Boot Autostart being enabled and Termux:Boot battery policy being unrestricted. See [`N4-MI10-BOOT-BLOCKER.md`](N4-MI10-BOOT-BLOCKER.md).
+
+`NODE-003B` must change only the Android cold-boot trigger. The already-proven runit service supervisor remains authoritative for host process lifecycle. A fallback bootstrap must not gain TASK parsing, Executor dispatch, canonical verification, retry, repair, or publication authority.
 
 Non-goals:
 - no remote wakeup yet;
@@ -175,7 +180,7 @@ Non-goals:
 - no mandatory wake lock without measured need.
 
 Gate:
-reboot → service restart → READY (or deterministic host-local DEGRADED), with no invented engineering state and no AIOS RUN started by service recovery.
+reboot → boot bootstrap → service supervisor → READY, with no invented engineering state and no AIOS RUN started by service recovery.
 
 Active plan: [`N4-PERSISTENT-HOST-PLAN.md`](N4-PERSISTENT-HOST-PLAN.md).
 
@@ -202,6 +207,8 @@ Initial enabled operation:
 
 Gate:
 invalid/unrecognized/unbounded requests fail before AIOS invocation.
+
+N5 remains blocked until N4 cold-boot persistence is physically proven.
 
 ### N6 — Private Remote Wakeup
 
